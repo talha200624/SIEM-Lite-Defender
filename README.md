@@ -9,11 +9,16 @@ Bu proje, Linux sunucularına yönelik SSH kaba kuvvet (brute-force) saldırıla
 * **Beyaz Liste (Whitelist):** Sistem yöneticisinin kendini yanlışlıkla engellemesini önleyen koruma mekanizması.
 
 **🛠️ Kurulum ve Kullanım**
-1. Gerekli kütüphaneyi kurun: `pip install requests`
-2. `siem_lite.py` içindeki `TELEGRAM_BOT_TOKEN` ve `TELEGRAM_CHAT_ID` kısımlarını kendi bilgilerinizle doldurun.
-3. Kendinizi banlamamak için `WHITELIST` dizisine kendi IP adresinizi ekleyin.
-4. Aracı root yetkisiyle çalıştırın: `sudo python3 siem_lite.py`
-
+1. Gerekli kütüphaneyi kurun:
+   ```
+   pip install requests
+   ```
+3. `siem_lite.py` içindeki `TELEGRAM_BOT_TOKEN` ve `TELEGRAM_CHAT_ID` kısımlarını kendi bilgilerinizle doldurun.
+4. Kendinizi banlamamak için `WHITELIST` dizisine kendi IP adresinizi ekleyin.
+5. Aracı root yetkisiyle çalıştırın:
+   ```
+   sudo python3 siem_lite.py
+   ```
 **⚠️ Yasal Uyarı**
 Bu araç tamamen eğitim ve kişisel sunucu güvenliği amacıyla geliştirilmiştir. Kendi yetkiniz olmayan sistemlerde kullanmayınız.
 
