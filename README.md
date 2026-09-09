@@ -22,27 +22,31 @@ Bu araç tamamen eğitim ve kişisel sunucu güvenliği amacıyla geliştirilmi�
 
 **🛡️ SIEM Lite - Active SSH Brute-Force Defender**
 
-This project is a lightweight IPS (Intrusion Prevention System) tool that detects SSH brute-force attacks targeting Linux servers, sends instant alerts to the system administrator via Telegram, and automatically blocks the attacker's IP address using the 'iptables' firewall.
+This project is a lightweight IPS (Intrusion Prevention System) tool that detects SSH brute-force attacks targeting Linux servers, sends instant alerts to the system administrator via Telegram, and automatically blocks the attacker's IP address using the `iptables` firewall.
 
 **🚀 Features**
 
-* **Real-Time Log Analysis:** Instant attacker detection using Regex on '/var/log/secure'.
+* **Real-Time Log Analysis:** Instant attacker detection using Regex on `/var/log/secure`.
 
 * **Instant Notification System:** Sends detailed alert messages via the Telegram API when a threat is detected.
 
-* **Active Defense:** Permanently bans IP addresses that exceed the defined threshold using 'iptables'.
+* **Active Defense:** Permanently bans IP addresses that exceed the defined threshold using `iptables`.
 
 * **Whitelist:** A protection mechanism that prevents system administrators from accidentally blocking their own IP addresses.
 
 **🛠️ Installation and Usage**
 
-1. Install the required library: 'pip install requests'
+1. Install the required library:
+   ```
+   pip install requests
+   ```
+3. Fill in the `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` variables in `siem_lite.py` with your own information.
 
-2. Fill in the 'TELEGRAM_BOT_TOKEN' and 'TELEGRAM_CHAT_ID' variables in 'siem_lite.py' with your own information.
+4. Add your own IP address to the `WHITELIST` array to avoid banning yourself.
 
-3. Add your own IP address to the 'WHITELIST' array to avoid banning yourself.
-
-4. Run the tool with root privileges: 'sudo python3 siem_lite.py'
-
+5. Run the tool with root privileges:
+   ```
+   sudo python3 siem_lite.py
+   ```
 **⚠️ Disclaimer**
 This tool is developed strictly for educational and personal server security purposes. Do not use it on systems you are not authorized to manage.
