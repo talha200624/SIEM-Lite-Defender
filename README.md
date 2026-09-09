@@ -23,7 +23,7 @@ Bu proje, Linux sunucularına yönelik SSH kaba kuvvet (brute-force) saldırıla
 Bu araç tamamen eğitim ve kişisel sunucu güvenliği amacıyla geliştirilmiştir. Kendi yetkiniz olmayan sistemlerde kullanmayınız.
 
 
-
+---
 
 **🛡️ SIEM Lite - Active SSH Brute-Force Defender**
 
