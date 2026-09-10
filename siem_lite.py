@@ -3,65 +3,64 @@ import requests
 import subprocess
 from collections import Counter
 
-# --- AYARLAR ---
-TELEGRAM_BOT_TOKEN = "BURAYA_BOTFATHERDAN_ALDIGIN_TOKENI_YAZ"
-TELEGRAM_CHAT_ID = "BURAYA_KENDI_ID_NUMARANI_YAZ"
+# --- SETTINGS ---
+TELEGRAM_BOT_TOKEN = "WRITE_THE_TOKEN_YOU_RECEIVED_FROM_BOTFATHER_HERE"
+TELEGRAM_CHAT_ID = "WRITE_YOUR_OWN_ID_NUMBER_HERE"
 
-# KENDİ IP ADRESİNİ BURAYA YAZ (Örn: "85.100.12.34"). Kendini banlamamak için çok önemli!
-WHITELIST = ["127.0.0.1", "KENDI_PUBLIC_IP_ADRESIN"] 
+# Enter your own IP address here (e.g., "85.100.12.34"). This is crucial to avoid banning yourself!
+WHITELIST = ["127.0.0.1", "YOUR_PUBLIC_IP_ADDRESS"] 
 
-def send_telegram_alert(ip, deneme_sayisi, ban_durumu):
+def send_telegram_alert(ip, number_of_attempts, ban_status):
     """
-    Tehlike tespit edildiğinde Telegram üzerinden yöneticiye mesaj atar.
-    Ban işleminin başarılı olup olmadığını da bildirir.
+    When a danger is detected, it sends a message to the administrator via Telegram.
+    It also reports whether the ban operation was successful.
     """
-    ban_mesaji = "✅ Başarıyla Engellendi (Iptables)" if ban_durumu else "❌ Engellenemedi / Beyaz Listede"
+    ban_msg = "✅ Successfully Blocked (Iptables)" if ban_status else "❌ Not Blocked / Whitelisted"
     
-    mesaj = (
-        f"🚨 *SIEM GÜVENLİK ALARMI* 🚨\n\n"
-        f"⚠️ *Tehdit:* SSH Brute-Force Saldırısı\n"
-        f"🌍 *Saldırgan IP:* `{ip}`\n"
-        f"🔢 *Başarısız Deneme:* {deneme_sayisi}\n"
-        f"🛑 *Aksiyon:* {ban_mesaji}"
+    msg = (
+        f"🚨 *SIEM Security Alarm* 🚨\n\n"
+        f"⚠️ *Threatening:* SSH Brute-Force Attack\n"
+        f"🌍 *Attacker IP:* `{ip}`\n"
+        f"🔢 *Başarısız Deneme:* {number_of_attempts}\n"
+        f"🛑 *Action:* {ban_msg}"
     )
     
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": mesaj, "parse_mode": "Markdown"}
+    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": msg, "parse_mode": "Markdown"}
     
     try:
         if "BURAYA" not in TELEGRAM_BOT_TOKEN:
             requests.post(url, json=payload, timeout=5)
     except Exception:
-        pass # Hata olsa bile scriptin çalışması durmasın
-
+        pass # The script should not stop running even if an error occurs.
 def block_ip(ip):
     """
-    Belirtilen IP adresini Linux Iptables kullanarak sunucudan banlar.
+    Ban the specified IP address from the server using Linux Iptables..
     """
     if ip in WHITELIST:
-        print(f"[-] KORUMA: {ip} adresi beyaz listede bulunuyor, banlanmadı!")
+        print(f"[-] PROTECTION: {ip} The address is on the whitelist; it hasn't been banned!")
         return False
 
     try:
-        # iptables komutu: -A (Kural ekle), INPUT (Gelen trafik), -s (Kaynak IP), -j DROP (Paketi düşür/yok et)
+        # iptables command: -A (Append rule), INPUT (Incoming traffic), -s (Source IP), -j DROP (Drop/discard packet)
         komut = ["iptables", "-A", "INPUT", "-s", ip, "-j", "DROP"]
         
-        # subprocess.run ile komutu terminalde çalıştırıyoruz
-        subprocess.run(komut, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"[+] AKTİF SAVUNMA: {ip} adresi güvenlik duvarından BAŞARIYLA BANLANDI!")
+        # We run the command in the terminal using subprocess.run.
+        subprocess.run(command, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(f"[+] ACTIVE DEFENSE: {ip} The address has been SUCCESSFULLY BANNED from the firewall!")
         return True
     except subprocess.CalledProcessError:
-        print(f"[-] Hata: {ip} adresi banlanırken iptables komutu başarısız oldu. (Root yetkisi var mı?)")
+        print(f"[-] Error: {ip} The iptables command failed while banning the address. (Do you have root privileges?)")
         return False
     except FileNotFoundError:
-        print("[-] Hata: iptables aracı bulunamadı. Sunucunuzda farklı bir güvenlik duvarı (örn: firewalld) olabilir.")
+        print("[-] Error: The iptables tool was not found. Your server might be using a different firewall (e.g., firewalld).")
         return False
 
 def analyze_real_log(log_path, threshold=5):
     """
-    Logları okur, saldırganı tespit eder ve aktif savunmayı tetikler.
+    It reads the logs, identifies the attacker, and triggers active defense.
     """
-    print(f"[*] {log_path} dosyası analiz ediliyor...\n")
+    print(f"[*] {log_path} The file is being analyzed...\n")
     regex_deseni = r"Failed password for .* from ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
     ip_sayici = Counter()
     
@@ -76,31 +75,31 @@ def analyze_real_log(log_path, threshold=5):
         tehlike_yok = True
         for ip, sayi in ip_sayici.items():
             if sayi >= threshold:
-                print(f"\n[!] ALARM (BRUTE-FORCE): {ip} adresinden {sayi} adet başarısız giriş tespit edildi!")
+                print(f"\n[!] ALARM (BRUTE-FORCE): {number} failed login attempts detected from {ip} address!")
                 
-                # 1. Adım: Saldırganı Banla
-                ban_durumu = block_ip(ip)
+                # Step 1: Block the attacker.
+                ban_status = block_ip(ip)
                 
-                # 2. Adım: Durumu Telegram'a Bildir
-                send_telegram_alert(ip, sayi, ban_durumu)
+                # Step 2: Report the situation to Telegram.
+                send_telegram_alert(ip, sayi, ban_status)
                 
                 tehlike_yok = False
                 
         if tehlike_yok:
-            print("[-] Eşik değeri aşan şüpheli bir IP tespit edilmedi.")
+            print("[-] No suspicious IP exceeding the threshold value was detected..")
             
     except PermissionError:
-        print(f"[-] Hata: Okuma yetkiniz yok. Lütfen scripti 'sudo' ile çalıştırın.")
+        print(f"[-] Error: You do not have read permission. Please run the script with 'sudo'.")
     except Exception as e:
-        print(f"[-] Beklenmeyen hata: {e}")
+        print(f"[-] Unexpected error: {e}")
 
 if __name__ == "__main__":
     print("-" * 50)
-    print("  SIEM LITE - AKTİF SAVUNMA SİSTEMİ (IPS)")
+    print("  SIEM LITE - ACTIVE DEFENSE SYSTEM (IPS)")
     print("-" * 50)
     
-    # Kendi bulut sunucun (Oracle) için log yolu
+    # Log path for your own cloud server (Oracle)
     hedeflanan_log = "/var/log/secure"      
     
-    # 5 ve üzeri başarısız deneme yapanlar anında banlanır.
+    # Those who make 5 or more failed attempts are instantly banned.
     analyze_real_log(hedeflanan_log, threshold=5)
